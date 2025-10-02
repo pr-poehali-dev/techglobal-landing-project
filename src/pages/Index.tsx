@@ -1,9 +1,83 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
+import useEmblaCarousel from 'embla-carousel-react';
+
+const ProductsCarousel = ({ products }: { products: any[] }) => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    align: 'start',
+    loop: false,
+    slidesToScroll: 1
+  });
+
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
+
+  return (
+    <div className="lg:hidden relative">
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex gap-4">
+          {products.map((product, idx) => (
+            <div key={idx} className="flex-[0_0_85%] min-w-0">
+              <Card className="overflow-hidden border-none shadow-lg">
+                <div className="relative h-64 bg-white overflow-hidden">
+                  <img 
+                    src={product.image} 
+                    alt={product.title}
+                    className="w-full h-full object-contain p-4"
+                  />
+                </div>
+                <CardContent className="p-6 bg-white">
+                  <h3 className="text-2xl font-bold mb-3 text-secondary">{product.title}</h3>
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                    <div className="flex items-center gap-1">
+                      <Icon name="Package" size={16} />
+                      {product.models}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Icon name="Weight" size={16} />
+                      {product.capacity}
+                    </div>
+                  </div>
+                  <Button className="w-full bg-primary hover:bg-primary/90">
+                    Подробнее
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div className="flex justify-center gap-4 mt-6">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={scrollPrev}
+          className="rounded-full w-12 h-12"
+        >
+          <Icon name="ChevronLeft" size={24} />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={scrollNext}
+          className="rounded-full w-12 h-12"
+        >
+          <Icon name="ChevronRight" size={24} />
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
@@ -154,7 +228,7 @@ const Index = () => {
             <p className="text-gray-600 text-lg">Широкий ассортимент спецтехники и промышленного оборудования</p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="hidden lg:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product, idx) => (
               <Card key={idx} className="overflow-hidden border-none shadow-lg hover-scale cursor-pointer group">
                 <div className="relative h-64 bg-white overflow-hidden">
@@ -183,6 +257,8 @@ const Index = () => {
               </Card>
             ))}
           </div>
+          
+          <ProductsCarousel products={products} />
         </div>
       </section>
 
